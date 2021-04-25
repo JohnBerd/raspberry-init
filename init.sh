@@ -33,18 +33,21 @@ conclusion() {
 # npm
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 
-apt install git vim nodejs build-essential zsh fonts-powerline net-tools xclip openssh-client openssh-server ssmtp
+sudo apt install git vim zsh nodejs build-essential fonts-powerline net-tools xclip openssh-client openssh-server ssmtp
 
 #shell
 if [ "$(cat ~/.zshrc | grep agnoster)" = "" ]; then
   echo -e "\e[33m[.]\e[0m Installing zsh config"
-  chsh -s /bin/zsh
+  sudo chsh -s /bin/zsh
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
   sed -i 's/robbyrussell/agnoster/g' ~/.zshrc
   mkdir -p ~/.zsh
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
   mv zsh-syntax-highlighting ~/.zsh
   echo -e "source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >>${ZDOTDIR:-$HOME}/.zshrc
+  sudo adduser -D -s /bin/zsh
+
+  # should install globally oh-my-zsh
 fi
 
 # docker
@@ -61,10 +64,17 @@ conclusion docker
 
 #user creation
 
-useradd xavier
-useradd yohan
-echo xavier:$default_password | chpasswd
-echo yohan:$default_password | chpasswd
+sudo useradd -m xavier
+sudo useradd -m yohan
+echo xavier:$default_password | sudo chpasswd
+echo yohan:$default_password | sudo chpasswd
+sudo usermod -aG sudo xavier
+sudo usermod -aG sudo yohan
+sudo chsh -s /bin/zsh xavier
+sudo chsh -s /bin/zsh yohan
+sudo cp -r .zsh* /home/xavier
+sudo cp -r .zsh* /home/yohan
+cd ~
 echo "Azot users added successfully!"
 
 # put the users ssh key on the server
@@ -93,10 +103,13 @@ fi
 # https://blog.edmdesigner.com/send-email-from-linux-command-line/
 # send email with
 # ssh command server@publicip
+# how to check passwords
 # you have to change your password which is Azerty45
 # from local user on linux - ssh-copy-id -i ~/.ssh/mykey user@host
 # add lines to the right file to connect directly
 # no permit password to connect on server
+# install zsh on both users
+# delete raspberry user
 
 
 
